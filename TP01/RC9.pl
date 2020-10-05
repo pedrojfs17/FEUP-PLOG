@@ -17,4 +17,4 @@ funcionario(carlos, feup).
 
 % a) aluno(Y, Z), professor(X, Z).
 % b) frequenta(Y, X); funcionario(Y, X).
-% c) 
+% c) aluno(X, Z), aluno(Y, Z), X@<Y; frequenta(X, W), frequenta(Y, W), X@<Y; funcionario(X, T), funcionario(Y, T), X@<Y.
