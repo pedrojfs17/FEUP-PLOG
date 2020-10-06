@@ -31,4 +31,4 @@ gosta_de(maria, tigre).
 
 % c) gosta_de(X, _Y), gosta_de(X, _Z), desporto(_Y), jogo(_Z).
 
-% d) mulher(_X), gosta_de(_X, tenis), gosta_de(X, tigre). 
+% d) mulher(_X), gosta_de(_X, tenis), gosta_de(_X, tigre). 
