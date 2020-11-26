@@ -151,8 +151,7 @@ mostInternational(ListOfCompanies) :-
         ),
         Counts
     ), 
-    reverse(Counts, SortedCounts),
-    SortedCounts = [MaxCount | _],
+    reverse(Counts, [MaxCount | _]),
     findall(
         Company,
         (
@@ -162,3 +161,20 @@ mostInternational(ListOfCompanies) :-
         ),
         ListOfCompanies
     ), !.
+
+
+/* 9 */
+make_pairs(L, P, [X-Y|Zs]) :-
+    select(X, L, L2),
+    select(Y, L2, L3),
+    G =.. [P, X, Y], G,
+    make_pairs(L3, P, Zs).
+
+make_pairs([], _, []).
+
+diff_max_2(X, Y) :- X < Y, X >= Y-2.
+
+
+/* 10 */
+
+
