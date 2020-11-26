@@ -97,3 +97,26 @@ pairableFlights :-
     fail.
 
 pairableFlights.
+
+
+/* 6 */
+tripDays(Trip, Time, FlightTimes, Days) :-
+    tripDays(Trip, Time, [], FlightTimes, 1, Days).
+
+tripDays([_ | []], _, FlightTimes, FlightTimes, Days, Days).
+
+tripDays([Country, Destination | Rest], Time, Acc, FlightTimes, DaysAcc, Days) :-
+    flight(Flight, Origin, Destin, DepartureTime, _, _),
+    airport(_, Origin, Country),
+    airport(_, Destin, Destination),
+    timeToMinutes(DepartureTime, DepartureMin),
+    timeToMinutes(Time, TimeMin),
+    (
+        DepartureMin < TimeMin + 30,
+        NewDaysAcc is DaysAcc + 1
+        ;
+        NewDaysAcc = DaysAcc
+    ),
+    arrivalTime(Flight, ArrivalTime),
+    append(Acc, [DepartureTime], NewAcc),
+    tripDays([Destination | Rest], ArrivalTime, NewAcc, FlightTimes, NewDaysAcc, Days).
