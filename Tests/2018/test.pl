@@ -120,3 +120,45 @@ tripDays([Country, Destination | Rest], Time, Acc, FlightTimes, DaysAcc, Days) :
     arrivalTime(Flight, ArrivalTime),
     append(Acc, [DepartureTime], NewAcc),
     tripDays([Destination | Rest], ArrivalTime, NewAcc, FlightTimes, NewDaysAcc, Days).
+
+
+/* 7 */
+:- use_module(library(lists)).
+
+avgFlightLengthFromAirport(Airport, AvgLength) :-
+    findall(
+        Duration, 
+        (
+            flight(_, Airport, _, _, Duration, _)
+            ;
+            flight(_, _, Airport, _, Duration, _)
+        ),
+        Durations
+    ), 
+    sumlist(Durations, Sum),
+    length(Durations, N),
+    AvgLength is Sum / N.
+
+
+/* 8 */
+mostInternational(ListOfCompanies) :-
+    setof(
+        Count,
+        (
+            company(C, _, _, _),
+            countries(C, CompanyCountries),
+            length(CompanyCountries, Count)
+        ),
+        Counts
+    ), 
+    reverse(Counts, SortedCounts),
+    SortedCounts = [MaxCount | _],
+    findall(
+        Company,
+        (
+            company(Company, _, _, _),
+            countries(Company, Countries),
+            length(Countries, MaxCount)
+        ),
+        ListOfCompanies
+    ), !.
