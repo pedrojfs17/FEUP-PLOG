@@ -31,43 +31,71 @@ sweet_recipes(MaxTime, NEggs, RecipeTimes, RecipeEggs, Cookings, Eggs) :-
 /**
  * 5
  */
+% cut(Shelves, Boards, SelectedBoards) :-
+%     length(Shelves, NShelves),
+%     length(Boards, NBoards),
+%     length(SelectedBoards, NShelves),
+
+%     domain(SelectedBoards, 1, NBoards),
+
+%     getUsedBoards(Shelves, SelectedBoards, UsedBoards, NBoards),
+%     constraintBoards(UsedBoards, Boards), 
+
+%     labeling([], SelectedBoards).
+
+
+% constraintBoards([], []).
+% constraintBoards([UsedBoard | UsedRest], [Board | Rest]) :-
+%     UsedBoard #=< Board,
+%     constraintBoards(UsedRest, Rest).
+
+
+% getUsedBoards(Shelves, SelectedBoards, UsedBoards, NBoards) :-
+%     length(BoardsAcc, NBoards),
+%     maplist(=(0), BoardsAcc),
+%     getTotalUsed(Shelves, SelectedBoards, BoardsAcc, UsedBoards).
+
+
+% getTotalUsed([], [], UsedBoards, UsedBoards).
+% getTotalUsed([Shelf | RestShelves], [Selected | Rest], Acc, UsedBoards) :-
+%     element(Selected, Acc, OldValue),
+%     NewValue #= OldValue + Shelf,
+%     copyListWithNewValue(Acc, NewAcc, Selected, NewValue),
+%     getTotalUsed(RestShelves, Rest, NewAcc, UsedBoards).
+
+
+
+% copyListWithNewValue([], [], _, _).
+% copyListWithNewValue([E1 | L1], [E2 | L2], NewValueIndex, NewValue) :-
+%     (NewValueIndex #= 1 #/\ E2 #= NewValue) #\/ (NewValueIndex #\= 1 #/\ E2 #= E1),
+%     N1 #= NewValueIndex - 1,
+%     copyListWithNewValue(L1, L2, N1, NewValue).
+
+
+    
+createMachines(_, [], Machines, Machines).
+createMachines(Id, [Board | Rest], Acc, Machines) :-
+    append(Acc, [machine(Id, Board)], NewAcc),
+    NewId is Id + 1,
+    createMachines(NewId, Rest, NewAcc, Machines).
+
+
+createTasks([], [], Tasks, Tasks).
+createTasks([Shelf | RestShelves], [Selected | Rest], Acc, Tasks) :-
+    append(Acc, [task(0, 1, 1, Shelf, Selected)], NewAcc),
+    createTasks(RestShelves, Rest, NewAcc, Tasks).
+
+
 cut(Shelves, Boards, SelectedBoards) :-
-    length(Shelves, NShelves),
+    same_length(Shelves, SelectedBoards),
     length(Boards, NBoards),
-    length(SelectedBoards, NShelves),
 
     domain(SelectedBoards, 1, NBoards),
-
-    getUsedBoards(Shelves, SelectedBoards, UsedBoards, NBoards),
-    constraintBoards(UsedBoards, Boards), 
+    
+    createMachines(1, Boards, [], Machines),
+    createTasks(Shelves, SelectedBoards, [], Tasks),
+    cumulatives(Tasks, Machines, [bound(upper)]),
 
     labeling([], SelectedBoards).
-
-
-constraintBoards([], []).
-constraintBoards([UsedBoard | UsedRest], [Board | Rest]) :-
-    UsedBoard #=< Board,
-    constraintBoards(UsedRest, Rest).
-
-
-getUsedBoards(Shelves, SelectedBoards, UsedBoards, NBoards) :-
-    length(BoardsAcc, NBoards),
-    maplist(=(0), BoardsAcc),
-    getTotalUsed(Shelves, SelectedBoards, BoardsAcc, UsedBoards).
-
-
-getTotalUsed([], [], UsedBoards, UsedBoards).
-getTotalUsed([Shelf | RestShelves], [Selected | Rest], Acc, UsedBoards) :-
-    element(Selected, Acc, OldValue),
-    NewValue #= OldValue + Shelf,
-    copyListWithNewValue(Acc, NewAcc, Selected, NewValue),
-    getTotalUsed(RestShelves, Rest, NewAcc, UsedBoards).
-
-
-
-copyListWithNewValue([], [], _, _).
-copyListWithNewValue([E1 | L1], [E2 | L2], NewValueIndex, NewValue) :-
-    (NewValueIndex #= 1 #/\ E2 #= NewValue) #\/ (NewValueIndex #\= 1 #/\ E2 #= E1),
-    N1 #= NewValueIndex - 1,
-    copyListWithNewValue(L1, L2, N1, NewValue).
+    
     

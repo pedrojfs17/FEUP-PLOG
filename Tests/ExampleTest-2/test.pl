@@ -83,64 +83,92 @@ constroi(NEmb,Orcamento,EmbPorObjeto,CustoPorObjeto,EmbUsadas,Objetos) :-
 % S = [3,3,2,3,1,1,2] ? ;
 % no
 
+% wrap(Presents, PaperRolls, SelectedPaperRolls) :-
+%     length(Presents, NPresentes),
+%     length(SelectedPaperRolls, NPresentes),
+
+%     length(PaperRolls, NRolos),
+
+%     domain(SelectedPaperRolls, 1, NRolos),
+
+%     constraint(Presents, PaperRolls, SelectedPaperRolls, NRolos), !,
+
+%     labeling([], SelectedPaperRolls).
+
+
+% constraint(Presents, PaperRolls, SelectedPaperRolls, NRolos) :-
+%     % Initialize the roll accumulator with all 0
+%     length(AccRolos, NRolos),
+%     maplist(=(0), AccRolos),
+
+%     % Get total used
+%     totalUsado(Presents, SelectedPaperRolls, AccRolos, RolosUsados),
+
+%     % Constraint the totals
+%     constraint(RolosUsados, PaperRolls).
+
+
+% /**
+%  * Ensure that the paper used of each roll is less than the roll length
+%  */
+% constraint([],[]).
+% constraint([Usado | RestUsado], [Rolo | RestRolos]) :-
+%     Usado #=< Rolo,
+%     constraint(RestUsado, RestRolos).
+
+
+% /**
+%  * Gets the total paper used in the wrapping
+%  */
+% totalUsado([], [], RolosUsados, RolosUsados). 
+
+% totalUsado([Present | RestPresents], [SelectedPaperRoll | RestPaperRolls], Acc, RolosUsados) :-
+%     element(SelectedPaperRoll, Acc, OldValue),
+%     NewValue #= OldValue + Present,
+%     copy_list_with_new_element(Acc, NewAcc, SelectedPaperRoll, NewValue),
+%     totalUsado(RestPresents, RestPaperRolls, NewAcc, RolosUsados).
+
+
+% /**
+%  * Copies list1 to list2 changing value in a given index
+%  */
+% copy_list_with_new_element([], [], _, _).
+
+% copy_list_with_new_element([E1 | R1], [E2 | R2], Index, Value) :-
+%     (Index #= 1 #/\ E2 #= Value) #\/ (Index #\= 1 #/\ E2 #= E1),
+%     NewIndex #= Index - 1,
+%     copy_list_with_new_element(R1, R2, NewIndex, Value).
+
+% wrap([12,50,14,8,10,90,24], [100,45,70], S).
 wrap(Presents, PaperRolls, SelectedPaperRolls) :-
-    length(Presents, NPresentes),
-    length(SelectedPaperRolls, NPresentes),
+    length(Presents, NPresents),
+    length(SelectedPaperRolls, NPresents),
+    length(PaperRolls, NRolls),
+    domain(SelectedPaperRolls, 1, NRolls),
 
-    length(PaperRolls, NRolos),
+    createMachines(1, PaperRolls, [], Machines),
+    createTasks(Presents, SelectedPaperRolls, [], Tasks),
 
-    domain(SelectedPaperRolls, 1, NRolos),
+    cumulatives(Tasks, Machines, [bound(upper)]),
 
-    constraint(Presents, PaperRolls, SelectedPaperRolls, NRolos), !,
-
-    labeling([], SelectedPaperRolls).
-
-
-constraint(Presents, PaperRolls, SelectedPaperRolls, NRolos) :-
-    % Initialize the roll accumulator with all 0
-    length(AccRolos, NRolos),
-    maplist(=(0), AccRolos),
-
-    % Get total used
-    totalUsado(Presents, SelectedPaperRolls, AccRolos, RolosUsados),
-
-    % Constraint the totals
-    constraint(RolosUsados, PaperRolls).
+    labeling([], SelectedPaperRolls), write(SelectedPaperRolls), nl, fail.
 
 
-/**
- * Ensure that the paper used of each roll is less than the roll length
- */
-constraint([],[]).
-constraint([Usado | RestUsado], [Rolo | RestRolos]) :-
-    Usado #=< Rolo,
-    constraint(RestUsado, RestRolos).
+
+createMachines(_, [], Machines, Machines).
+
+createMachines(ID, [Roll | Rest], Acc, Machines) :-
+    append(Acc, [machine(ID, Roll)], NewAcc),
+    NewID is ID + 1,
+    createMachines(NewID, Rest, NewAcc, Machines).
 
 
-/**
- * Gets the total paper used in the wrapping
- */
-totalUsado([], [], RolosUsados, RolosUsados). 
+createTasks([], [], Tasks, Tasks).
 
-totalUsado([Present | RestPresents], [SelectedPaperRoll | RestPaperRolls], Acc, RolosUsados) :-
-    element(SelectedPaperRoll, Acc, OldValue),
-    NewValue #= OldValue + Present,
-    copy_list_with_new_element(Acc, NewAcc, SelectedPaperRoll, NewValue),
-    totalUsado(RestPresents, RestPaperRolls, NewAcc, RolosUsados).
+createTasks([Present | Rest], [Machine | RestMachines], Acc, Tasks) :-
+    append(Acc, [task(0, 1, 1, Present, Machine)], NewAcc),
+    createTasks(Rest, RestMachines, NewAcc, Tasks).
 
-
-/**
- * Copies list1 to list2 changing value in a given index
- */
-copy_list_with_new_element([], [], _, _).
-
-copy_list_with_new_element([E1 | R1], [E2 | R2], Index, Value) :-
-    (Index #= 1 #/\ E2 #= Value) #\/ (Index #\= 1 #/\ E2 #= E1),
-    NewIndex #= Index - 1,
-    copy_list_with_new_element(R1, R2, NewIndex, Value).
-
-
-    
 
     
 
