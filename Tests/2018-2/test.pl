@@ -1,4 +1,32 @@
 :- use_module(library(clpfd)).
+:- use_module(library(lists)).
+
+/**
+ * 3
+ */
+prog2(N,M,L1,L2) :-
+    length(L1,N),
+    N1 is N-1, length(L2,N1),
+
+    Lists = [L1, L2],
+    append(Lists, Vars),
+    domain(Vars,1,M),
+
+    all_distinct(Vars),
+    check(L1,L2),
+
+    element(1, L1, X),
+    element(N, L1, Y),
+
+    X #< Y,
+
+    labeling([],Vars), write(L1), write(L2), nl, fail.
+
+check([_],[]).
+check([A,B|R],[X|Xs]) :-
+    A+B #= X,
+    check([B|R],Xs).
+
 
 /**
  * 4
