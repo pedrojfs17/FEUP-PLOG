@@ -1,4 +1,6 @@
 :- use_module(library(clpfd)).
+:- use_module(library(lists)).
+
 
 /**
  * 5
@@ -122,6 +124,50 @@ copy_list_with_new_element([E1 | R1], [E2 | R2], Index, Value) :-
     (Index #= 1 #/\ E2 #= Value) #\/ (Index #\= 1 #/\ E2 #= E1),
     NewIndex #= Index - 1,
     copy_list_with_new_element(R1, R2, NewIndex, Value).
+
+
+/**
+ * 8
+ */
+objeto(piano, 3, 30).
+objeto(cadeira, 1, 10).
+objeto(cama, 3, 15).
+objeto(mesa, 2, 15).
+homens(4).
+tempo_max(60).
+
+
+get_tasks([],[], [], _, Tasks,Tasks).
+get_tasks([_-NH-DH | DT], [SH | ST], [EH | ET], Count, Accum, Tasks):-
+	append(Accum, [task(SH, DH, EH, NH, Count)], NextAccum),
+	NextCount is Count + 1,
+	get_tasks(DT, ST, ET, NextCount, NextAccum, Tasks).
+	
+
+furniture :-
+	homens(NumHomens),
+	tempo_max(Tempo_max),
+    findall(Objeto-NHomens-Duracao, objeto(Objeto, NHomens, Duracao), Objetos),
+    
+	length(Objetos, NumObjetos),
+	length(StartTimes, NumObjetos),
+    length(EndTimes, NumObjetos),
+    
+	domain(StartTimes, 0, Tempo_max),
+    domain(EndTimes, 0, Tempo_max),
+    
+	maximum(Tempo, EndTimes),
+    Tempo #=< Tempo_max,
+    get_tasks(Objetos, StartTimes, EndTimes, 1, [], Tasks),
+    
+    cumulative(Tasks, [limit(NumHomens)]),
+    
+    append(StartTimes, EndTimes, Vars), !,
+    
+	labeling([minimize(Tempo)], Vars),
+	write(Tempo), nl,
+    write(StartTimes),
+    write(EndTimes).
 
 
     
