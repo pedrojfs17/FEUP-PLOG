@@ -31,41 +31,64 @@ check([A,B|R],[X|Xs]) :-
 /**
  * 4
  */
-gym_pairs(MenHeights, WomenHeights, Delta, Pairs) :-
-    length(MenHeights, NPeople),
-    length(Pairs, NPeople),
+% gym_pairs(MenHeights, WomenHeights, Delta, Pairs) :-
+%     length(MenHeights, NPeople),
+%     length(Pairs, NPeople),
 
-    % Each position refers to a men. The value refers to the index of the women
-    length(Men, NPeople),
-    domain(Men, 1, NPeople),
-    all_distinct(Men),
+%     % Each position refers to a men. The value refers to the index of the women
+%     length(Men, NPeople),
+%     domain(Men, 1, NPeople),
+%     all_distinct(Men),
 
-    constraint(1, Men, MenHeights, WomenHeights, Delta),
+%     constraint(1, Men, MenHeights, WomenHeights, Delta),
 
-    labeling([], Men),
+%     labeling([], Men),
 
-    buildList(Men, 1, [], Pairs).
-
-
-constraint(_, [], _, _, _).
-
-constraint(N, [Men | Rest], MenHeights, WomenHeights, Delta) :-
-    element(N, MenHeights, MenHeight),
-    element(Men, WomenHeights, WomenHeight),
-    MenHeight #>= WomenHeight,
-    MenHeight #=< WomenHeight + Delta,
-    N1 is N + 1,
-    constraint(N1, Rest, MenHeights, WomenHeights, Delta).
+%     buildList(Men, 1, [], Pairs).
 
 
+% constraint(_, [], _, _, _).
 
-buildList([], _, Pairs, Pairs).
+% constraint(N, [Men | Rest], MenHeights, WomenHeights, Delta) :-
+%     element(N, MenHeights, MenHeight),
+%     element(Men, WomenHeights, WomenHeight),
+%     MenHeight #>= WomenHeight,
+%     MenHeight #=< WomenHeight + Delta,
+%     N1 is N + 1,
+%     constraint(N1, Rest, MenHeights, WomenHeights, Delta).
 
-buildList([Men | Rest], N, Acc, Pairs) :-
-    Pair = N-Men,
-    append(Acc, [Pair], NewAcc),
-    N1 is N + 1,
-    buildList(Rest, N1, NewAcc, Pairs).
+
+
+% buildList([], _, Pairs, Pairs).
+
+% buildList([Men | Rest], N, Acc, Pairs) :-
+%     Pair = N-Men,
+%     append(Acc, [Pair], NewAcc),
+%     N1 is N + 1,
+%     buildList(Rest, N1, NewAcc, Pairs).
+
+gym_pairs(MenHeights, WomenHeights, Delta, Pairs):-
+	length(MenHeights, N),
+	same_length(Hs, Ms, N),
+	domain(Hs, 1, N),
+	domain(Ms, 1, N),
+	all_distinct(Hs),
+	all_distinct(Ms),
+	scanlist(heightRule(MenHeights, WomenHeights, Delta), Hs, Ms, _, _),
+	Hs = [First|Rest],
+	scanlist(sortIt, Rest, First, _), % no symmetries
+	
+	append(Hs, Ms, Vars),
+	labeling([], Vars),
+	keys_and_values(Pairs, Hs, Ms).
+	
+	
+heightRule(MenHeights, WomenHeights, Delta, Hi, Mi, _, _):-
+	element(Hi, MenHeights, H),
+	element(Mi, WomenHeights, M),
+	H #> M #/\ H - M #=< Delta.
+	
+sortIt(Current, Prev, Current):- Prev #< Current.
 
 
 /**
