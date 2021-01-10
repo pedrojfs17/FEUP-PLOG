@@ -1,0 +1,21 @@
+4x4
+Took 0.094 sec.
+
+5x5
+Took 0.156 sec.
+
+6x6
+Took 0.250 sec.
+
+7x7
+Took 0.391 sec.
+
+8x8
+Took 0.578 sec.
+
+9x9
+Took 9.563 sec.
+
+10x10
+Took 586.281 sec.
+

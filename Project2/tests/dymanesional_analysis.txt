@@ -1,0 +1,23 @@
+Solving 100 problems with [ff. median, up]
+
+4x4
+Took 0.125s
+
+5x5
+Took 0.203s
+
+6x6
+Took 0.266s
+
+7x7
+Took 0.390s
+
+8x8
+Took 0.579s
+
+9x9
+Took 0.609s
+
+10x10
+Took 0.766s
+
